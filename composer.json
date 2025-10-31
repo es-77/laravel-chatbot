@@ -1,0 +1,27 @@
+{
+    "name": "emmanuel-saleem/laravel-chatbot",
+    "description": "A Laravel Chatbot package.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "EmmanuelSaleem\\LaravelChatbot\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "EmmanuelSaleem\\LaravelChatbot\\Providers\\LaravelChatbotServiceProvider"
+            ],
+            "aliases": {
+                "LaravelChatbot": "EmmanuelSaleem\\LaravelChatbot\\Facades\\LaravelChatbot"
+            }
+        }
+    },
+    "require": {
+        "php": ">=7.4",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
+        "botman/botman": "^2.6",
+        "botman/driver-web": "^1.5"
+    }
+}
