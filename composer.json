@@ -1,8 +1,42 @@
 {
     "name": "emmanuel-saleem/laravel-chatbot",
-    "description": "A Laravel Chatbot package.",
+    "description": "Laravel chatbot package for Q&A, FAQ and support. Database-driven intents with keyword AND/OR matching, conditional replies, buttons and variable substitution. Works with Laravel 8–12 and integrates with BotMan (web driver) for web/embedded chat widgets.",
     "type": "library",
     "license": "MIT",
+    "homepage": "https://github.com/es-77/laravel-chatbot",
+    "keywords": [
+        "laravel",
+        "laravel chatbot",
+        "chatbot",
+        "q&a",
+        "faq bot",
+        "support bot",
+        "customer support",
+        "botman",
+        "web chat",
+        "database",
+        "package",
+        "intent matching",
+        "conditional logic",
+        "variable substitution",
+        "buttons",
+        "web chat",
+        "embedded chat",
+        "chat widget",
+        "chatbot integration"
+    ],
+    "support": {
+        "issues": "https://github.com/es-77/laravel-chatbot/issues",
+        "source": "https://github.com/es-77/laravel-chatbot"
+    },
+    "authors": [
+        {
+            "name": "Emmanuel Saleem",
+            "email": "emmanuelsaleem098765@gmail.com",
+            "homepage": "https://www.linkedin.com/in/es77/?originalSubdomain=pk",
+            "role": "Maintainer"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "EmmanuelSaleem\\LaravelChatbot\\": "src/"
