@@ -1,6 +1,25 @@
 @csrf
 
-<div class="space-y-8">
+<!-- Message Card -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow ring-1 ring-gray-200 dark:ring-gray-700 p-6 mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Message</h3>
+        <button type="button" id="help-toggle" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-900/50">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10A8 8 0 11.001 10 8 8 0 0118 10zM9 7a1 1 0 112 0 1 1 0 01-2 0zm2 3a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clip-rule="evenodd" /></svg>
+            Help
+        </button>
+    </div>
+    <div id="help-panel" class="hidden mb-6 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4 text-sm text-blue-800 dark:text-blue-200">
+        <div class="font-semibold mb-2">How to use</div>
+        <ul class="list-disc pl-5 space-y-1">
+            <li>Type your main question or scenario in the Question field.</li>
+            <li>Add multiple <strong>keywords</strong>; press Enter or comma to add a tag.</li>
+            <li>Choose <strong>OR</strong> (any keyword) or <strong>AND</strong> (all keywords) matching.</li>
+            <li>Use variables in the answer: <code class="px-1 rounded bg-blue-100 dark:bg-blue-800">@{{user.name}}</code>, <code class="px-1 rounded bg-blue-100 dark:bg-blue-800">@{{user.email}}</code>, <code class="px-1 rounded bg-blue-100 dark:bg-blue-800">@{{session.deal_count}}</code>.</li>
+            <li>Add optional buttons for quick actions below.</li>
+        </ul>
+    </div>
+    <div class="space-y-8">
     <!-- Question -->
     <div>
         <label for="question" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -61,7 +80,7 @@
     </div>
 
     <!-- Logic Operator -->
-    <div>
+    {{-- <div>
         <label for="logic_operator" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
             Logic Operator <span class="text-red-500">*</span>
         </label>
@@ -94,7 +113,7 @@
         @error('logic_operator')
             <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
         @enderror
-    </div>
+    </div> --}}
 
     <!-- Answer -->
     <div>
@@ -110,11 +129,12 @@
         <div class="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
             <p class="text-xs font-medium text-blue-800 dark:text-blue-300 mb-1">Variable Support:</p>
             <p class="text-xs text-blue-700 dark:text-blue-400">Use @{{user.name}}, @{{user.email}}, @{{session.deal_count}} for dynamic content.</p>
-        </div>
+    </div>
     </div>
 
-    <!-- Buttons -->
-    <div>
+    <!-- Buttons Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow ring-1 ring-gray-200 dark:ring-gray-700 p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Buttons</h3>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Buttons</label>
         <div id="buttons-container" class="space-y-4">
             @php
@@ -175,8 +195,9 @@
         <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Add interactive buttons to bot responses. URLs support variables.</p>
     </div>
 
-    <!-- Conditions -->
-    <div>
+    <!-- Conditions Card -->
+    {{-- <div class="bg-white dark:bg-gray-800 rounded-xl shadow ring-1 ring-gray-200 dark:ring-gray-700 p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Conditions</h3>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Conditions</label>
         <div id="conditions-container" class="space-y-3">
             @php
@@ -241,9 +262,11 @@
             Add Condition
         </button>
         <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Set conditions based on session/user data. Leave empty if no conditions needed.</p>
-    </div>
+    </div> --}}
 
-    <!-- Priority -->
+    <!-- Settings Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow ring-1 ring-gray-200 dark:ring-gray-700 p-6">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Settings</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
             <label for="priority" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Priority</label>
@@ -269,6 +292,7 @@
                 </div>
             </label>
         </div>
+    </div>
     </div>
 </div>
 
@@ -331,6 +355,14 @@ keywordsInput.addEventListener('keydown', function(e) {
 
 // Initialize from existing keywords
 document.addEventListener('DOMContentLoaded', function() {
+    // Help toggle
+    const helpToggle = document.getElementById('help-toggle');
+    const helpPanel = document.getElementById('help-panel');
+    if (helpToggle && helpPanel) {
+        helpToggle.addEventListener('click', function() {
+            helpPanel.classList.toggle('hidden');
+        });
+    }
     const existing = keywordsHidden.value;
     if (existing) {
         existing.split(',').forEach(keyword => {
