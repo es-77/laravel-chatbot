@@ -183,6 +183,57 @@
             gap: 10px;
         }
         
+        /* Operations bar (no dropdown) */
+        .op-bar {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            bottom: 72px; /* sits above input */
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 10px;
+            display: none;
+            z-index: 20;
+        }
+        .op-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .op-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            color: #374151;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s, transform .15s;
+            font-weight: 500;
+        }
+        .op-item:hover { background: #eef2ff; transform: translateY(-1px); }
+        .op-item.primary { background: #eef2ff; border-color: #c7d2fe; color: #4f46e5; }
+
+        /* Mode hint */
+        .mode-hint { font-size: .85rem; color: #6b7280; margin-top: 6px; display: none; }
+
+        /* Toast / inline notice */
+        .toast {
+            position: absolute;
+            right: 24px;
+            bottom: 90px;
+            background: #111827;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 30;
+        }
+        .toast a { color: #93c5fd; text-decoration: underline; }
+
         .chat-input {
             flex: 1;
             padding: 12px 16px;
@@ -258,6 +309,21 @@
                 >
                 <button type="submit" class="send-button" id="sendButton">Send</button>
             </form>
+            <div class="mode-hint" id="modeHint"></div>
+        </div>
+
+        <!-- Operations bar (Ctrl+O) -->
+        <div class="op-bar" id="opBar">
+            <div style="margin-bottom: 6px; color: #6b7280; font-size: .85rem;">Operations</div>
+            <div class="op-items" id="opItems"></div>
+        </div>
+
+        <!-- Toast (Ctrl+@) -->
+        <div class="toast" id="quickToast">
+            Saved question exists. 
+            @if (Route::has('bot-questions.create'))
+                <a href="{{ route('bot-questions.create') }}" style="margin-left:8px;">Add new</a>
+            @endif
         </div>
     </div>
 
@@ -266,6 +332,71 @@
         const chatForm = document.getElementById('chatForm');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
+        const opBar = document.getElementById('opBar');
+        const opItems = document.getElementById('opItems');
+        const modeHint = document.getElementById('modeHint');
+        const quickToast = document.getElementById('quickToast');
+
+        let isQuestionMode = false;
+        const operations = [
+            { label: 'AND', insert: ' and ' },
+            { label: 'OR', insert: ' or ' },
+            { label: 'NOT', insert: ' not ' },
+            { label: 'IF', insert: ' if () ' },
+            { label: 'ELSEIF', insert: ' elseif () ' },
+            { label: '== (equal to)', insert: ' == ' },
+        ];
+
+        function buildOpBar() {
+            opItems.innerHTML = '';
+            operations.forEach((op, idx) => {
+                const el = document.createElement('div');
+                el.className = 'op-item' + (idx < 3 ? ' primary' : '');
+                el.textContent = op.label;
+                el.addEventListener('click', () => {
+                    insertAtCursor(op.insert.replace('()','( )'));
+                    hideOpBar();
+                    messageInput.focus();
+                });
+                opItems.appendChild(el);
+            });
+        }
+
+        function showOpBar() { buildOpBar(); opBar.style.display = 'block'; }
+        function hideOpBar() { opBar.style.display = 'none'; }
+
+        function insertAtCursor(text) {
+            const start = messageInput.selectionStart;
+            const end = messageInput.selectionEnd;
+            const current = messageInput.value;
+            messageInput.value = current.substring(0, start) + text + current.substring(end);
+            const caret = start + text.length;
+            messageInput.setSelectionRange(caret, caret);
+        }
+
+        function setQuestionMode(on) {
+            isQuestionMode = !!on;
+            if (isQuestionMode) {
+                modeHint.style.display = 'block';
+                modeHint.textContent = 'Question/Keywords mode: type your question or keywords.';
+                messageInput.placeholder = 'Type question or keywords...';
+            } else {
+                modeHint.style.display = 'none';
+                messageInput.placeholder = 'Type your message...';
+            }
+        }
+
+        function showSavedQuestionNotice() {
+            // Visual toast
+            quickToast.style.display = 'block';
+            setTimeout(() => { quickToast.style.display = 'none'; }, 3000);
+            // Inline bot-style message with action
+            const buttons = [];
+            @if (Route::has('bot-questions.create'))
+                buttons.push({ label: 'Add New Question', url: '{{ route('bot-questions.create') }}', style: 'secondary', target: '_self' });
+            @endif
+            addMessage('A similar question may already be saved.', 'bot', buttons);
+        }
 
         chatForm.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -302,6 +433,32 @@
                 sendButton.disabled = false;
                 sendButton.innerHTML = 'Send';
                 messageInput.focus();
+            }
+        });
+
+        // Global keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+O → operations bar
+            if (e.ctrlKey && (e.key === 'o' || e.key === 'O')) {
+                e.preventDefault();
+                if (opBar.style.display === 'block') hideOpBar(); else showOpBar();
+                return;
+            }
+            // Ctrl+Q → question/keywords mode
+            if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
+                e.preventDefault();
+                setQuestionMode(!isQuestionMode);
+                return;
+            }
+            // Ctrl+@ → saved question notice
+            if (e.ctrlKey && e.key === '@') {
+                e.preventDefault();
+                showSavedQuestionNotice();
+                return;
+            }
+            // Escape closes op bar
+            if (e.key === 'Escape') {
+                hideOpBar();
             }
         });
 

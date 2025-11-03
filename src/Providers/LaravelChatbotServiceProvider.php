@@ -40,6 +40,11 @@ class LaravelChatbotServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../../config/laravel-chatbot.php' => config_path('laravel-chatbot.php'),
             ], 'laravel-chatbot-config');
+
+            // Publish views (UI)
+            $this->publishes([
+                __DIR__ . '/../../resources/views' => resource_path('views/vendor/laravel-chatbot'),
+            ], 'laravel-chatbot-views');
         }
     }
 }
