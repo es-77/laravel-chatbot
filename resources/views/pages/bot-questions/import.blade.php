@@ -181,11 +181,19 @@ CRITICAL KEYWORD GUIDELINES:
 6. Use specific terms from the question (e.g., "programming language", "arduino", "c++") rather than generic words
 7. Consider common misspellings or alternative phrasings users might use
 
+IMPORTANT - AVOID OVERLY BROAD KEYWORDS:
+- DO NOT use single common words that appear in many queries (e.g., "arduino", "laravel" alone) unless the question is specifically about that single topic
+- For comparison questions (e.g., "difference between X and Y"), you MUST use "AND" logic OR include comparison-specific keywords like "difference", "compare", "vs", "versus"
+- Example: For "What is the difference between Arduino and Laravel?", use: {"keywords": ["difference", "arduino", "laravel"], "logic_operator": "AND"} OR {"keywords": ["difference", "compare", "arduino laravel", "arduino vs laravel"], "logic_operator": "OR"}
+- Questions about a single topic should have specific keywords that won't match unrelated queries
+
 EXAMPLES:
 Good: {"keywords": ["arduino", "programming", "language"], "logic_operator": "OR"} - matches "What language does Arduino use?"
+Good: {"keywords": ["difference", "arduino", "laravel"], "logic_operator": "AND"} - matches "difference between arduino and laravel" but NOT "install laravel"
+Bad: {"keywords": ["arduino", "laravel"], "logic_operator": "OR"} - matches EVERYTHING mentioning either word, causing wrong answers
 Bad: {"keywords": ["arduino", "programming language", "code", "language"], "logic_operator": "AND"} - won't match if user doesn't type "code"
 
-Generate [NUMBER] questions about [TOPIC]. For each question, carefully select 3-5 keywords that users are most likely to type. Prefer "OR" logic unless the question truly requires all keywords. Return only valid JSON, no markdown formatting.
+Generate [NUMBER] questions about [TOPIC]. For each question, carefully select 3-5 keywords that users are most likely to type. For comparison questions, use "AND" logic or include comparison terms. Avoid single-word keywords that are too common. Return only valid JSON, no markdown formatting.
                     </div>
                     <button type="button" onclick="copyAIPrompt()" 
                             class="mt-2 text-sm bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded transition">

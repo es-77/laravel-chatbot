@@ -34,12 +34,16 @@ class BotQuestionMatcherService
             $matchedKeywords = $this->countMatchedKeywords($question, $normalizedMessage);
             $totalKeywords = count($question->keywords);
             
-            // Calculate match score:
-            // - Priority (multiplied by 10000 to give it high weight)
-            // - Matched keywords ratio (multiplied by 1000 to prioritize questions with more matched keywords)
-            // - Total keywords (as tie-breaker, prefer questions with more keywords)
+            // Calculate match ratio (how many keywords matched vs total)
             $matchRatio = $totalKeywords > 0 ? ($matchedKeywords / $totalKeywords) : 0;
-            $matchScore = $question->priority * 10000 + ($matchRatio * 1000) + $matchedKeywords;
+            
+            // Calculate match score with improved algorithm:
+            // 1. Match ratio is most important (multiplied by 50000) - questions with more matched keywords win
+            // 2. Priority (multiplied by 1000) - but less important than match ratio
+            // 3. Matched keywords count (multiplied by 100) - as tie-breaker
+            // 4. Total keywords (multiplied by 10) - prefer more specific questions (fewer keywords = more specific)
+            // This ensures that a question matching 3/3 keywords beats one matching 1/4 keywords, even if the latter has higher priority
+            $matchScore = ($matchRatio * 50000) + ($question->priority * 1000) + ($matchedKeywords * 100) + ($totalKeywords * 10);
             
             $matches[] = [
                 'question' => $question,
