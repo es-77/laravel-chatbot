@@ -5,8 +5,8 @@ use EmmanuelSaleem\LaravelChatbot\Http\Controllers\BotQuestionController;
 use EmmanuelSaleem\LaravelChatbot\Http\Controllers\BotManController;
 
 Route::get('chatbot', function () {
-    return config('laravel-chatbot.welcome_message');
-});
+    return view('laravel-chatbot::pages.botman-chat');
+})->name('chatbot');
 
 // Bot Web Chat Routes
 Route::post('botman/web-chat', [BotManController::class, 'webChat'])->name('botman.web-chat');
