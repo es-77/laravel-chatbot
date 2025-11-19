@@ -46,7 +46,9 @@ class BotQuestionController extends Controller
      */
     public function create()
     {
-        return view('laravel-chatbot::pages.bot-questions.create');
+        // Ensure $errors variable is available to the view
+        $errors = session('errors') ?: new ViewErrorBag();
+        return view('laravel-chatbot::pages.bot-questions.create', ['errors' => $errors]);
     }
 
     /**
@@ -80,7 +82,9 @@ class BotQuestionController extends Controller
      */
     public function edit(BotQuestion $botQuestion)
     {
-        return view('laravel-chatbot::pages.bot-questions.edit', compact('botQuestion'));
+        // Ensure $errors variable is available to the view
+        $errors = session('errors') ?: new ViewErrorBag();
+        return view('laravel-chatbot::pages.bot-questions.edit', compact('botQuestion', 'errors'));
     }
 
     /**

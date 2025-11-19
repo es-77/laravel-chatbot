@@ -13,18 +13,12 @@ A Laravel package that lets you manage chatbot Q&A in the database, with keyword
 
 ## 1) Install the package
 ```bash
-composer require emmanuel-saleem/laravel-chatbot:@dev --prefer-source
+composer require emmanuel-saleem/laravel-chatbot
 ```
 
 BotMan is included as a dependency. If you need the web driver explicitly:
 ```bash
 composer require botman/driver-web:^1.5
-```
-
-### Prefer installing a tagged (stable) release
-After you create a Git tag (see “Release a new version” below) and the version is available on Packagist, install without `@dev`:
-```bash
-composer require emmanuel-saleem/laravel-chatbot:^0.1.0
 ```
 
 ## 2) Publish assets (config, migrations, views)
@@ -55,16 +49,76 @@ The package registers routes automatically:
 If you are using a test/breeze app, protect admin routes with `auth` as needed.
 
 ## 5) Admin UI
-After publishing views (optional), navigate to your admin routes. If you prefer the package views without publishing, use:
-- All Questions: `route('bot-questions.index')`
-- Create Question: `route('bot-questions.create')`
 
+### Access Admin Pages
+After installation, you can access the admin interface at:
+- **All Questions**: `http://your-app.com/admin/bot-questions`
+- **Create Question**: `http://your-app.com/admin/bot-questions/create`
+- **Import Questions**: `http://your-app.com/admin/bot-questions/import`
+
+Or use route helpers in your code:
+```php
+route('bot-questions.index')      // List all questions
+route('bot-questions.create')    // Create new question
+route('bot-questions.import')    // Import questions from JSON
+```
+
+**Note:** Protect these routes with authentication middleware in your application. For example, in `routes/web.php`:
+```php
+Route::middleware(['auth'])->prefix('admin/bot-questions')->group(function () {
+    // Package routes are already registered, but you can wrap them
+});
+```
+
+### Create Questions
+1. Navigate to **Create Question** (`/admin/bot-questions/create`)
+2. Fill in the form:
+   - **Question**: Descriptive text for your reference
+   - **Keywords**: Add multiple keywords (press Enter or comma to add each keyword)
+   - **Logic Operator**: Choose OR (any keyword matches) or AND (all keywords must match)
+   - **Answer**: The bot's response (supports variables like `@{{user.name}}`, `@{{user.email}}`, `@{{session.deal_count}}`)
+   - **Buttons** (optional): Add interactive buttons with labels and URLs
+   - **Priority**: Higher numbers = higher priority (default: 0)
+   - **Status**: Active/Inactive toggle
+3. Click **Save** to create the question
+
+### Import Questions
+1. Navigate to **Import Questions** (`/admin/bot-questions/import`)
+2. Choose import method:
+   - **Upload JSON File**: Select a JSON file from your computer
+   - **Paste JSON Content**: Paste JSON directly into the textarea
+3. Use the provided JSON structure format (see the import page for details)
+4. Click **Import Questions** to process
+
+**JSON Structure Example:**
+```json
+[
+  {
+    "question": "What is your return policy?",
+    "keywords": ["return", "refund", "policy"],
+    "logic_operator": "OR",
+    "answer": "We offer a 30-day return policy.",
+    "priority": 10,
+    "is_active": true,
+    "buttons": [
+      {
+        "label": "Learn More",
+        "url": "https://example.com/returns",
+        "style": "primary",
+        "target": "_blank"
+      }
+    ]
+  }
+]
+```
+
+### Question Features
 Each question supports:
-- Keywords: tag input (press Enter or comma)
-- Logic operator: OR/AND
-- Variables in answers: `@{{user.name}}`, `@{{user.email}}`, `@{{session.deal_count}}`
-- Conditions (optional) against session/user data
-- Buttons (optional) rendered in web chat responses
+- **Keywords**: Tag input (press Enter or comma to add)
+- **Logic Operator**: OR (any keyword) or AND (all keywords)
+- **Variables in Answers**: `@{{user.name}}`, `@{{user.email}}`, `@{{session.deal_count}}`
+- **Conditions** (optional): Match based on session/user data
+- **Buttons** (optional): Interactive buttons rendered in chat responses
 
 ## 6) Web Chat page (included)
 The package includes a simple web chat at:
@@ -126,7 +180,7 @@ php artisan view:clear
 ## 11) Quick copy commands
 ```bash
 # Install
-composer require emmanuel-saleem/laravel-chatbot:@dev --prefer-source
+composer require emmanuel-saleem/laravel-chatbot
 
 # Publish all
 php artisan vendor:publish --provider="EmmanuelSaleem\LaravelChatbot\Providers\LaravelChatbotServiceProvider"
@@ -137,60 +191,23 @@ php artisan vendor:publish --provider="EmmanuelSaleem\LaravelChatbot\Providers\L
 php artisan vendor:publish --provider="EmmanuelSaleem\LaravelChatbot\Providers\LaravelChatbotServiceProvider" --tag=laravel-chatbot-views
 
 # Migrate
-printf "\nApplying migrations...\n" && php artisan migrate
+php artisan migrate
 
 # Clear compiled views (useful during dev)
 php artisan view:clear
 ```
 
 ## 12) Troubleshooting
-- If Composer fails because of stability: ensure your app allows installing `@dev` or require a specific commit/branch.
-- If UI changes don’t show after publishing, add `--force` when re-publishing views and clear compiled views.
+- If UI changes don't show after publishing, add `--force` when re-publishing views and clear compiled views:
+  ```bash
+  php artisan vendor:publish --provider="EmmanuelSaleem\LaravelChatbot\Providers\LaravelChatbotServiceProvider" --tag=laravel-chatbot-views --force
+  php artisan view:clear
+  ```
 - For login-bound variables in the web chat, ensure Ajax requests include cookies. The default chat sends `credentials: 'same-origin'`.
+- If you see "Unable to locate component [admin-layout]", the package includes a default admin layout. If you published views, ensure your published `admin-layout.blade.php` exists or remove it to use the package's default.
 
 ---
 
 Happy building! If something feels rough, open an issue or send a PR.
-
----
-
-## Maintainers: Release a new version (no @dev installs)
-
-1) Choose the next semantic version (example: v0.1.0):
-```bash
-git add -A
-git commit -m "chore(release): v0.1.0"
-git tag v0.1.0
-git push origin main --tags
-```
-
-2) Ensure the package is on Packagist and auto-updates
-- Create/claim on Packagist: `https://packagist.org/packages/submit`
-- Package name should be `emmanuel-saleem/laravel-chatbot`
-- Enable “auto-update via GitHub webhook” (recommended)
-
-3) Consumers can now install a stable tag (no @dev):
-```bash
-composer require emmanuel-saleem/laravel-chatbot:^0.1.0
-```
-
-### Optional: organization/vendor move
-If you plan to publish under an organization (e.g., `es-77/laravel-chatbot`), update `composer.json`:
-```json
-{
-  "name": "es-77/laravel-chatbot",
-  "description": "A Laravel Chatbot package.",
-  "type": "library"
-}
-```
-Then create the new package on Packagist and deprecate the old one, or set it to “Abandoned: use es-77/laravel-chatbot” in Packagist settings.
-
-### Badges (forks / issues / stars)
-Add these to the top of the README (replace `main` if using another branch):
-```md
-![Stars](https://img.shields.io/github/stars/es-77/laravel-chatbot?style=social)
-![Forks](https://img.shields.io/github/forks/es-77/laravel-chatbot?style=social)
-![Issues](https://img.shields.io/github/issues/es-77/laravel-chatbot)
-```
 
 
