@@ -5,9 +5,17 @@
 
     <div class="mb-6 flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">All Questions</h2>
-        <a href="{{ route('bot-questions.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition">
-            Create New Question
-        </a>
+        <div class="flex gap-3">
+            <a href="{{ route('bot-questions.import') }}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                Import Questions
+            </a>
+            <a href="{{ route('bot-questions.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition">
+                Create New Question
+            </a>
+        </div>
     </div>
 
     <!-- Filters -->

@@ -30,14 +30,22 @@ class BotQuestionMatcherService
                 continue;
             }
 
-            // Calculate match score (priority + keyword count as tie-breaker)
-            $keywordCount = count($question->keywords);
-            $matchScore = $question->priority * 1000 + $keywordCount;
+            // Calculate how many keywords actually matched
+            $matchedKeywords = $this->countMatchedKeywords($question, $normalizedMessage);
+            $totalKeywords = count($question->keywords);
+            
+            // Calculate match score:
+            // - Priority (multiplied by 10000 to give it high weight)
+            // - Matched keywords ratio (multiplied by 1000 to prioritize questions with more matched keywords)
+            // - Total keywords (as tie-breaker, prefer questions with more keywords)
+            $matchRatio = $totalKeywords > 0 ? ($matchedKeywords / $totalKeywords) : 0;
+            $matchScore = $question->priority * 10000 + ($matchRatio * 1000) + $matchedKeywords;
             
             $matches[] = [
                 'question' => $question,
                 'score' => $matchScore,
-                'keyword_count' => $keywordCount,
+                'matched_keywords' => $matchedKeywords,
+                'total_keywords' => $totalKeywords,
             ];
         }
 
@@ -45,14 +53,31 @@ class BotQuestionMatcherService
             return null;
         }
 
-        // Sort by score (descending), then by keyword count (descending)
+        // Sort by score (descending), then by matched keywords (descending)
         usort($matches, function ($a, $b) {
             if ($a['score'] === $b['score']) {
-                return $b['keyword_count'] <=> $a['keyword_count'];
+                return $b['matched_keywords'] <=> $a['matched_keywords'];
             }
             return $b['score'] <=> $a['score'];
         });
 
         return $matches[0]['question'];
+    }
+
+    /**
+     * Count how many keywords from the question are present in the message.
+     */
+    protected function countMatchedKeywords(BotQuestion $question, string $normalizedMessage): int
+    {
+        $normalizedKeywords = array_map('strtolower', array_filter($question->keywords));
+        $matchedCount = 0;
+
+        foreach ($normalizedKeywords as $keyword) {
+            if (strpos($normalizedMessage, $keyword) !== false) {
+                $matchedCount++;
+            }
+        }
+
+        return $matchedCount;
     }
 }

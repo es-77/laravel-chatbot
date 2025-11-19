@@ -19,6 +19,8 @@ Route::prefix('admin/bot-questions')->name('bot-questions.')->group(function () 
     Route::get('/', [BotQuestionController::class, 'index'])->name('index');
     Route::get('/create', [BotQuestionController::class, 'create'])->name('create');
     Route::post('/', [BotQuestionController::class, 'store'])->name('store');
+    Route::get('/import', [BotQuestionController::class, 'import'])->name('import');
+    Route::post('/import', [BotQuestionController::class, 'processImport'])->name('import.process');
     Route::get('/{botQuestion}', [BotQuestionController::class, 'show'])->name('show');
     Route::get('/{botQuestion}/edit', [BotQuestionController::class, 'edit'])->name('edit');
     Route::put('/{botQuestion}', [BotQuestionController::class, 'update'])->name('update');
