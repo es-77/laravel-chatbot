@@ -10,7 +10,7 @@ class BotQuestion extends Model
 {
     use HasFactory;
 
-    protected $table = 'bot_questions';
+    protected $table = 'es_bot_questions';
 
     protected $fillable = [
         'question',

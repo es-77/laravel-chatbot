@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bot_questions', function (Blueprint $table) {
+        Schema::create('es_bot_questions', function (Blueprint $table) {
             $table->id();
             $table->text('question');
             $table->json('keywords');
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bot_questions');
+        Schema::dropIfExists('es_bot_questions');
     }
 };

@@ -3,7 +3,7 @@
     "description": "Laravel chatbot package for Q&A, FAQ and support. Database-driven intents with keyword AND/OR matching, conditional replies, buttons and variable substitution. Works with Laravel 8–12 and integrates with BotMan (web driver) for web/embedded chat widgets.",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "homepage": "https://github.com/es-77/laravel-chatbot",
     "keywords": [
         "laravel",
