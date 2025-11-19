@@ -183,14 +183,18 @@ CRITICAL KEYWORD GUIDELINES:
 
 IMPORTANT - AVOID OVERLY BROAD KEYWORDS:
 - DO NOT use single common words that appear in many queries (e.g., "arduino", "laravel" alone) unless the question is specifically about that single topic
-- For comparison questions (e.g., "difference between X and Y"), you MUST use "AND" logic OR include comparison-specific keywords like "difference", "compare", "vs", "versus"
-- Example: For "What is the difference between Arduino and Laravel?", use: {"keywords": ["difference", "arduino", "laravel"], "logic_operator": "AND"} OR {"keywords": ["difference", "compare", "arduino laravel", "arduino vs laravel"], "logic_operator": "OR"}
+- For comparison questions (e.g., "difference between X and Y"), you MUST use "AND" logic with individual words, NOT phrases
+- Example: For "What is the difference between Arduino and Laravel?", use: {"keywords": ["difference", "arduino", "laravel"], "logic_operator": "AND"}
+- DO NOT use phrases like "compare laravel codeigniter" or "arduino vs laravel" in AND logic - use individual words instead
+- When using AND logic, each keyword should be a single word or very short phrase (2 words max)
 - Questions about a single topic should have specific keywords that won't match unrelated queries
 
 EXAMPLES:
 Good: {"keywords": ["arduino", "programming", "language"], "logic_operator": "OR"} - matches "What language does Arduino use?"
 Good: {"keywords": ["difference", "arduino", "laravel"], "logic_operator": "AND"} - matches "difference between arduino and laravel" but NOT "install laravel"
+Good: {"keywords": ["difference", "laravel", "codeigniter"], "logic_operator": "AND"} - matches comparison questions about Laravel and CodeIgniter
 Bad: {"keywords": ["arduino", "laravel"], "logic_operator": "OR"} - matches EVERYTHING mentioning either word, causing wrong answers
+Bad: {"keywords": ["difference", "laravel", "codeigniter", "compare laravel codeigniter"], "logic_operator": "AND"} - phrase "compare laravel codeigniter" won't match, causing failure
 Bad: {"keywords": ["arduino", "programming language", "code", "language"], "logic_operator": "AND"} - won't match if user doesn't type "code"
 
 Generate [NUMBER] questions about [TOPIC]. For each question, carefully select 3-5 keywords that users are most likely to type. For comparison questions, use "AND" logic or include comparison terms. Avoid single-word keywords that are too common. Return only valid JSON, no markdown formatting.

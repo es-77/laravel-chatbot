@@ -77,8 +77,25 @@ class BotQuestionMatcherService
         $matchedCount = 0;
 
         foreach ($normalizedKeywords as $keyword) {
-            if (strpos($normalizedMessage, $keyword) !== false) {
-                $matchedCount++;
+            $keyword = trim($keyword);
+            // For multi-word keywords (phrases), check if all words are present
+            if (strpos($keyword, ' ') !== false) {
+                $words = explode(' ', $keyword);
+                $allWordsPresent = true;
+                foreach ($words as $word) {
+                    if (strpos($normalizedMessage, trim($word)) === false) {
+                        $allWordsPresent = false;
+                        break;
+                    }
+                }
+                if ($allWordsPresent) {
+                    $matchedCount++;
+                }
+            } else {
+                // Single word keyword - direct match
+                if (strpos($normalizedMessage, $keyword) !== false) {
+                    $matchedCount++;
+                }
             }
         }
 

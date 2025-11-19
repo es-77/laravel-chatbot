@@ -75,9 +75,27 @@ class BotQuestion extends Model
 
         if ($this->logic_operator === 'AND') {
             // All keywords must be present
+            // For multi-word keywords (phrases), check if all words in the phrase are present
             foreach ($normalizedKeywords as $keyword) {
-                if (strpos($normalizedMessage, $keyword) === false) {
-                    return false;
+                $keyword = trim($keyword);
+                // If keyword contains spaces (multi-word), check if all words are present
+                if (strpos($keyword, ' ') !== false) {
+                    $words = explode(' ', $keyword);
+                    $allWordsPresent = true;
+                    foreach ($words as $word) {
+                        if (strpos($normalizedMessage, trim($word)) === false) {
+                            $allWordsPresent = false;
+                            break;
+                        }
+                    }
+                    if (!$allWordsPresent) {
+                        return false;
+                    }
+                } else {
+                    // Single word keyword - direct match
+                    if (strpos($normalizedMessage, $keyword) === false) {
+                        return false;
+                    }
                 }
             }
             return true;
