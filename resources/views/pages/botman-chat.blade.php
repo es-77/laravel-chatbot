@@ -411,6 +411,7 @@
             sendButton.innerHTML = '<span class="loading"></span>';
             
             try {
+                const currentUrl = window.location.href;
                 const response = await fetch('{{ route("botman.web-chat") }}', {
                     method: 'POST',
                     headers: {
@@ -419,7 +420,10 @@
                         'Accept': 'application/json'
                     },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ 
+                        message: message,
+                        page_url: currentUrl
+                    })
                 });
                 
                 const data = await response.json();

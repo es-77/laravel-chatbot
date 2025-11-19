@@ -56,17 +56,19 @@ class BotManController extends Controller
     {
         $request->validate([
             'message' => 'required|string|max:1000',
+            'page_url' => 'nullable|string|max:2048',
         ]);
 
         // Build session data for response
         $sessionData = $this->buildSessionData($request);
         $message = $request->input('message');
+        $pageUrl = $request->input('page_url') ?? $request->header('Referer') ?? url()->current();
 
         // Use the matcher service directly for JSON API response
         $matcherService = app(\EmmanuelSaleem\LaravelChatbot\Services\Bot\BotQuestionMatcherService::class);
         $substitutionService = app(\EmmanuelSaleem\LaravelChatbot\Services\Bot\VariableSubstitutionService::class);
 
-        $matchedQuestion = $matcherService->findBestMatch($message, $sessionData);
+        $matchedQuestion = $matcherService->findBestMatch($message, $sessionData, $pageUrl);
 
         $response = ['text' => '', 'buttons' => []];
 

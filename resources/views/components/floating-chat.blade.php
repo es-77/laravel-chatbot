@@ -102,6 +102,7 @@
                 if (!text) return;
                 appendMessage(text, 'user');
                 input.value = '';
+                const currentUrl = window.location.href;
                 fetch('{{ route('botman.web-chat') }}', {
                     method: 'POST',
                     headers: {
@@ -110,7 +111,10 @@
                         'Accept': 'application/json'
                     },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({ 
+                        message: text,
+                        page_url: currentUrl
+                    })
                 })
                 .then(r => r.json())
                 .then(data => {

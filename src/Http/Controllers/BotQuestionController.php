@@ -36,6 +36,11 @@ class BotQuestionController extends Controller
             $query->where('priority', $request->priority);
         }
 
+        // Filter by page URL
+        if ($request->filled('page_url')) {
+            $query->forPageUrl($request->page_url);
+        }
+
         $questions = $query->ordered()->paginate(15);
 
         return view('laravel-chatbot::pages.bot-questions.index', compact('questions'));
@@ -60,6 +65,7 @@ class BotQuestionController extends Controller
         $validated['keywords'] = $this->parseKeywords($validated['keywords']);
         $validated['buttons'] = $this->parseButtons($request->input('buttons', []));
         $validated['conditions'] = $this->parseConditions($request->input('conditions', []));
+        $validated['page_urls'] = $this->parsePageUrls($request->input('page_urls', ''));
 
         BotQuestion::create($validated);
 
@@ -93,6 +99,7 @@ class BotQuestionController extends Controller
         $validated['keywords'] = $this->parseKeywords($validated['keywords']);
         $validated['buttons'] = $this->parseButtons($request->input('buttons', []));
         $validated['conditions'] = $this->parseConditions($request->input('conditions', []));
+        $validated['page_urls'] = $this->parsePageUrls($request->input('page_urls', ''));
 
         $botQuestion->update($validated);
 
@@ -177,6 +184,7 @@ class BotQuestionController extends Controller
                         : $this->parseKeywords($validated['keywords'] ?? '');
                     $validated['buttons'] = $this->parseButtons($validated['buttons'] ?? []);
                     $validated['conditions'] = $this->parseImportedConditions($validated['conditions'] ?? []);
+                    $validated['page_urls'] = $this->parseImportedPageUrls($validated['page_urls'] ?? []);
 
                     BotQuestion::create($validated);
                     $imported++;
@@ -216,6 +224,7 @@ class BotQuestionController extends Controller
             'buttons.*.style' => 'nullable|in:primary,secondary',
             'buttons.*.target' => 'nullable|in:_blank,_self',
             'conditions' => 'nullable',
+            'page_urls' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -251,6 +260,7 @@ class BotQuestionController extends Controller
             'conditions.*.key' => 'nullable|string|max:255',
             'conditions.*.operator' => 'nullable|in:==,!=,>,>=,<,<=',
             'conditions.*.value' => 'nullable|string|max:255',
+            'page_urls' => 'nullable|string',
         ])->validate();
     }
 
@@ -330,5 +340,60 @@ class BotQuestionController extends Controller
 
         // Otherwise, use the form parser (array format)
         return $this->parseConditions($conditions);
+    }
+
+    /**
+     * Parse page URLs from comma-separated string or newline-separated.
+     */
+    protected function parsePageUrls($pageUrls): ?array
+    {
+        if (empty($pageUrls)) {
+            return null;
+        }
+
+        if (is_array($pageUrls)) {
+            $urls = $pageUrls;
+        } else {
+            // Support both comma and newline separation
+            $urls = preg_split('/[,\n\r]+/', $pageUrls);
+        }
+
+        $parsed = [];
+        foreach ($urls as $url) {
+            $url = trim($url);
+            if (!empty($url)) {
+                // Normalize URL to path
+                $parsed[] = \EmmanuelSaleem\LaravelChatbot\Models\BotQuestion::normalizeUrlToPathStatic($url);
+            }
+        }
+
+        return empty($parsed) ? null : array_unique($parsed);
+    }
+
+    /**
+     * Parse page URLs from imported JSON.
+     */
+    protected function parseImportedPageUrls($pageUrls): ?array
+    {
+        if (empty($pageUrls)) {
+            return null;
+        }
+
+        if (is_array($pageUrls)) {
+            $urls = $pageUrls;
+        } else {
+            $urls = [$pageUrls];
+        }
+
+        $parsed = [];
+        foreach ($urls as $url) {
+            $url = trim($url);
+            if (!empty($url)) {
+                // Normalize URL to path
+                $parsed[] = \EmmanuelSaleem\LaravelChatbot\Models\BotQuestion::normalizeUrlToPathStatic($url);
+            }
+        }
+
+        return empty($parsed) ? null : array_unique($parsed);
     }
 }

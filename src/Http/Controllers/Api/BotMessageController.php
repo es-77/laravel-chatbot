@@ -33,13 +33,15 @@ class BotMessageController extends Controller
         $request->validate([
             'message' => 'required|string|max:1000',
             'session_data' => 'sometimes|array',
+            'page_url' => 'nullable|string|max:2048',
         ]);
 
         $message = $request->input('message');
         $sessionData = $this->buildSessionData($request);
+        $pageUrl = $request->input('page_url') ?? $request->header('Referer') ?? url()->current();
 
         // Find matching question
-        $matchedQuestion = $this->matcherService->findBestMatch($message, $sessionData);
+        $matchedQuestion = $this->matcherService->findBestMatch($message, $sessionData, $pageUrl);
 
         $response = [
             'success' => true,

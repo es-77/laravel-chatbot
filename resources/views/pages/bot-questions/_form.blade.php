@@ -132,6 +132,23 @@
     </div>
     </div>
 
+    <!-- Page URLs -->
+    <div>
+        <label for="page_urls" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Page URLs (Optional)
+        </label>
+        <textarea name="page_urls" id="page_urls" 
+                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('page_urls') border-red-500 ring-red-500 @enderror" 
+                  rows="4" placeholder="Enter page URLs where this question should appear (one per line or comma-separated)&#10;Examples:&#10;http://127.0.0.1:8000/login&#10;https://staging.example.com/login&#10;https://example.com/login">{{ old('page_urls', isset($botQuestion) && $botQuestion->page_urls ? implode("\n", $botQuestion->page_urls) : '') }}</textarea>
+        @error('page_urls')
+            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+        @enderror
+        <div class="mt-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+            <p class="text-xs font-medium text-green-800 dark:text-green-300 mb-1">Page URL Filtering:</p>
+            <p class="text-xs text-green-700 dark:text-green-400">Leave empty for global questions (appear on all pages). Add URLs to show this question only on specific pages. URLs are normalized to paths (e.g., /login).</p>
+        </div>
+    </div>
+
     <!-- Buttons Card -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow ring-1 ring-gray-200 dark:ring-gray-700 p-6 mb-8">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Buttons</h3>

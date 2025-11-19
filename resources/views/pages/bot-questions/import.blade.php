@@ -115,6 +115,7 @@
     "keywords": ["return", "refund", "policy"],
     "logic_operator": "OR",
     "answer": "We offer a 30-day return policy. You can return items...",
+    "page_urls": ["/returns", "/help"],
     "priority": 10,
     "is_active": true,
     "buttons": [
@@ -141,6 +142,7 @@
                         <li><strong>keywords</strong> (required): Array of keywords for matching (e.g., ["hello", "hi"])</li>
                         <li><strong>logic_operator</strong> (optional): "AND" or "OR" (default: "OR")</li>
                         <li><strong>answer</strong> (required): The bot's response text</li>
+                        <li><strong>page_urls</strong> (optional): Array of URLs/paths where this question appears (e.g., ["/login", "/register"]). Leave empty for global questions</li>
                         <li><strong>priority</strong> (optional): Integer, higher = more priority (default: 0)</li>
                         <li><strong>is_active</strong> (optional): true/false (default: true)</li>
                         <li><strong>buttons</strong> (optional): Array of button objects with label, url, style, target</li>
@@ -167,6 +169,7 @@ Generate a JSON array for a Laravel chatbot Q&A system. Each object must have:
 - "keywords" (array of strings, required): Keywords for matching user messages
 - "logic_operator" (string, optional): "AND" or "OR" (default "OR")
 - "answer" (string, required): The bot's response text
+- "page_urls" (array of strings, optional): URLs/paths where this question should appear (e.g., ["/login", "/register"]). Leave empty or omit for global questions (appear on all pages)
 - "priority" (integer, optional): Higher numbers = higher priority (default 0)
 - "is_active" (boolean, optional): Whether the question is active (default true)
 - "buttons" (array, optional): Array of objects with "label" (string), "url" (string), "style" ("primary" or "secondary"), "target" ("_blank" or "_self")
@@ -244,26 +247,36 @@ Generate [NUMBER] questions about [TOPIC]. For each question, carefully select 3
     "question": "What is your return policy?",
     "keywords": ["return", "refund", "policy"],
     "logic_operator": "OR",
-    "answer": "We offer a 30-day return policy. You can return items in original condition within 30 days of purchase.",
-    "priority": 10,
-    "is_active": true,
-    "buttons": [
-      {
-        "label": "Learn More",
-        "url": "https://example.com/returns",
-        "style": "primary",
-        "target": "_blank"
-      }
-    ]
-  },
-  {
-    "question": "How do I contact support?",
-    "keywords": ["contact", "support", "help", "customer service"],
-    "logic_operator": "OR",
-    "answer": "You can contact our support team via email at support@example.com or call us at 1-800-123-4567.",
-    "priority": 5,
-    "is_active": true
-  }
+                    "answer": "We offer a 30-day return policy. You can return items in original condition within 30 days of purchase.",
+                    "page_urls": ["/returns", "/help"],
+                    "priority": 10,
+                    "is_active": true,
+                    "buttons": [
+                      {
+                        "label": "Learn More",
+                        "url": "https://example.com/returns",
+                        "style": "primary",
+                        "target": "_blank"
+                      }
+                    ]
+                  },
+                  {
+                    "question": "How do I contact support?",
+                    "keywords": ["contact", "support", "help", "customer service"],
+                    "logic_operator": "OR",
+                    "answer": "You can contact our support team via email at support@example.com or call us at 1-800-123-4567.",
+                    "priority": 5,
+                    "is_active": true
+                  },
+                  {
+                    "question": "How do I login?",
+                    "keywords": ["login", "sign in", "access"],
+                    "logic_operator": "OR",
+                    "answer": "You can login using your email and password. Click the login button in the top right corner.",
+                    "page_urls": ["/login", "http://127.0.0.1:8000/login"],
+                    "priority": 10,
+                    "is_active": true
+                  }
 ]`;
             navigator.clipboard.writeText(example).then(() => {
                 alert('JSON example copied to clipboard!');

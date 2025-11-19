@@ -9,13 +9,19 @@ class BotQuestionMatcherService
     /**
      * Find the best matching question for the given message and session data.
      */
-    public function findBestMatch(string $message, array $sessionData): ?BotQuestion
+    public function findBestMatch(string $message, array $sessionData, ?string $pageUrl = null): ?BotQuestion
     {
         // Normalize message
         $normalizedMessage = strtolower(trim($message));
 
-        // Get all active questions ordered by priority
-        $questions = BotQuestion::active()->ordered()->get();
+        // Get all active questions ordered by priority, filtered by page URL if provided
+        $questions = BotQuestion::active()->ordered();
+        
+        if ($pageUrl !== null) {
+            $questions = $questions->forPageUrl($pageUrl);
+        }
+        
+        $questions = $questions->get();
 
         $matches = [];
 

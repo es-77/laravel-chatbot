@@ -36,6 +36,10 @@
                 <input type="number" name="priority" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" 
                        placeholder="Priority" value="{{ request('priority') }}">
             </div>
+            <div class="min-w-[200px]">
+                <input type="text" name="page_url" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" 
+                       placeholder="Filter by page URL..." value="{{ request('page_url') }}">
+            </div>
             <button type="submit" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">Filter</button>
             <a href="{{ route('bot-questions.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition">Clear</a>
         </form>
@@ -50,6 +54,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Question</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Keywords</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Page URLs</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Logic</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Priority</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
@@ -69,6 +74,17 @@
                                         <span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">{{ $kw }}</span>
                                     @endforeach
                                 </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                @if(empty($question->page_urls) || count($question->page_urls) === 0)
+                                    <span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Global</span>
+                                @else
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach($question->page_urls as $url)
+                                            <span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" title="{{ $url }}">{{ $url }}</span>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $question->logic_operator }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $question->priority }}</td>
@@ -98,7 +114,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">No questions found.</td>
+                            <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">No questions found.</td>
                         </tr>
                     @endforelse
                 </tbody>

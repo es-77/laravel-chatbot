@@ -19,6 +19,7 @@ class BotQuestion extends Model
         'answer',
         'conditions',
         'buttons',
+        'page_urls',
         'priority',
         'is_active',
         'created_by',
@@ -28,6 +29,7 @@ class BotQuestion extends Model
         'keywords' => 'array',
         'conditions' => 'array',
         'buttons' => 'array',
+        'page_urls' => 'array',
         'is_active' => 'boolean',
         'priority' => 'integer',
     ];
@@ -55,6 +57,86 @@ class BotQuestion extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('priority', 'desc')->orderBy('id', 'desc');
+    }
+
+    /**
+     * Scope a query to filter by page URL.
+     */
+    public function scopeForPageUrl($query, ?string $url)
+    {
+        if (empty($url)) {
+            // If no URL provided, return questions with no page_urls (global questions)
+            return $query->where(function ($q) {
+                $q->whereNull('page_urls')
+                  ->orWhere('page_urls', '[]')
+                  ->orWhere('page_urls', '');
+            });
+        }
+
+        // Normalize URL to path
+        $path = static::normalizeUrlToPathStatic($url);
+
+        return $query->where(function ($q) use ($path) {
+            // Questions with no page_urls (global) or matching path
+            $q->where(function ($subQ) {
+                $subQ->whereNull('page_urls')
+                     ->orWhere('page_urls', '[]')
+                     ->orWhere('page_urls', '');
+            })
+            ->orWhereRaw('JSON_CONTAINS(page_urls, CAST(? AS JSON))', [json_encode($path)]);
+        });
+    }
+
+    /**
+     * Check if this question is applicable for the given URL.
+     */
+    public function isApplicableForUrl(?string $url): bool
+    {
+        // If no page_urls set, question is global (applicable everywhere)
+        if (empty($this->page_urls) || count($this->page_urls) === 0) {
+            return true;
+        }
+
+        if (empty($url)) {
+            return false;
+        }
+
+        $path = $this->normalizeUrlToPath($url);
+
+        // Check if the path matches any of the page_urls
+        foreach ($this->page_urls as $pageUrl) {
+            $normalizedPageUrl = $this->normalizeUrlToPath($pageUrl);
+            if ($normalizedPageUrl === $path) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Normalize URL to path (remove domain, query params, etc.).
+     */
+    protected function normalizeUrlToPath(string $url): string
+    {
+        return static::normalizeUrlToPathStatic($url);
+    }
+
+    /**
+     * Static version of normalizeUrlToPath for use in scopes.
+     */
+    public static function normalizeUrlToPathStatic(string $url): string
+    {
+        // Parse URL
+        $parsed = parse_url($url);
+        
+        // Get path (default to /)
+        $path = $parsed['path'] ?? '/';
+        
+        // Remove leading/trailing slashes except for root
+        $path = $path === '/' ? '/' : trim($path, '/');
+        
+        return $path;
     }
 
     /**
