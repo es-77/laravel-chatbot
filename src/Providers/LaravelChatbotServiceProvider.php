@@ -3,6 +3,7 @@
 namespace EmmanuelSaleem\LaravelChatbot\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class LaravelChatbotServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,10 @@ class LaravelChatbotServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
         $this->loadRoutesFrom(__DIR__ . '/../../routes/api.php');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'laravel-chatbot');
+
+        // Register the admin-layout component so it's available globally
+        // This allows views to use <x-admin-layout> even if the component isn't in the app
+        Blade::component('laravel-chatbot::components.admin-layout', 'admin-layout');
 
         // Publish migrations
         if ($this->app->runningInConsole()) {
